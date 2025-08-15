@@ -1,0 +1,8 @@
+<h2>Connexion</h2>
+<form method="post">
+    {% csrf_token %}
+    <p>{{ form.username.label_tag }} {{ form.username }}</p>
+    <p>{{ form.password.label_tag }} {{ form.password }}</p>
+    <p>{{ form.role.label_tag }} {{ form.role }}</p>
+    <button type="submit">Se connecter</button>
+</form>
