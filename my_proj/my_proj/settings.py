@@ -77,11 +77,8 @@ AUTH_USER_MODEL = 'my_app.Utilisateur'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ecole',
-        'USER': 'postgres',
-        'PASSWORD': 190903,
-        'HOST': 'localhost',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 

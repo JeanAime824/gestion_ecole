@@ -1,3 +1,44 @@
-<h2>Dashboard Administrateur</h2>
-<p>Bienvenue {{ user.username }}</p>
-<a href="{% url 'ajouter_responsable' %}">Ajouter un responsable</a>
+{% extends "base.html" %}
+
+{% block title %}Dashboard Administrateur{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Dashboard Administrateur</h2>
+            <p class="lead">Bienvenue, {{ user.username }} !</p>
+            <hr>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Responsables</h5>
+                    <p class="card-text">Gérer les responsables de l'école.</p>
+                    <a href="{% url 'ajouter_responsable' %}" class="btn btn-light">Ajouter un responsable</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-secondary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Classes</h5>
+                    <p class="card-text">Gérer les classes de l'école.</p>
+                    <a href="{% url 'liste_classes' %}" class="btn btn-light">Voir les classes</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Élèves</h5>
+                    <p class="card-text">Gérer tous les élèves.</p>
+                    <a href="{% url 'liste_eleves' %}" class="btn btn-light">Voir les élèves</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Liste des Élèves{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Liste des Élèves</h2>
+    <a href="{% url 'ajouter_eleve' %}" class="btn btn-success">Ajouter un élève</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Date de Naissance</th>
+                    <th>Classe</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for eleve in eleves %}
+                <tr>
+                    <td>{{ eleve.nom }}</td>
+                    <td>{{ eleve.prenom }}</td>
+                    <td>{{ eleve.date_naissance }}</td>
+                    <td>{{ eleve.classe.nom }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">Aucun élève trouvé.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="mt-3">
+    <a href="{% if user.role == 'administrateur' %}{% url 'admin_dashboard' %}{% else %}{% url 'responsable_dashboard' %}{% endif %}" class="btn btn-secondary">Retour au Dashboard</a>
+</div>
+{% endblock %}

@@ -1,7 +1,8 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import ConnexionForm, ResponsableCreationForm
+from .models import Classe, Eleve, Utilisateur
 
 # Vérifie si l'utilisateur est admin
 def is_admin(user):
@@ -65,3 +66,49 @@ def responsable_dashboard(request):
     if request.user.role != "responsable":
         return redirect('login')
     return render(request, 'responsable_dashboard.html')
+
+# Vue de déconnexion
+def deconnexion_view(request):
+    logout(request)
+    return redirect('login')
+
+# Vue de profil
+@login_required
+def profile_view(request):
+    return render(request, 'profile.html')
+
+# --- GESTION DES CLASSES (ADMIN) ---
+@login_required
+@user_passes_test(is_admin)
+def liste_classes(request):
+    classes = Classe.objects.all()
+    return render(request, 'liste_classes.html', {'classes': classes})
+
+@login_required
+@user_passes_test(is_admin)
+def ajouter_classe(request):
+    if request.method == "POST":
+        nom = request.POST.get('nom')
+        niveau = request.POST.get('niveau')
+        Classe.objects.create(nom=nom, niveau=niveau)
+        return redirect('liste_classes')
+    return render(request, 'ajouter_classe.html')
+
+# --- GESTION DES ÉLÈVES (RESPONSABLE & ADMIN) ---
+@login_required
+def liste_eleves(request):
+    eleves = Eleve.objects.all()
+    return render(request, 'liste_eleves.html', {'eleves': eleves})
+
+@login_required
+def ajouter_eleve(request):
+    classes = Classe.objects.all()
+    if request.method == "POST":
+        nom = request.POST.get('nom')
+        prenom = request.POST.get('prenom')
+        date_naissance = request.POST.get('date_naissance')
+        classe_id = request.POST.get('classe')
+        classe = get_object_or_404(Classe, id=classe_id)
+        Eleve.objects.create(nom=nom, prenom=prenom, date_naissance=date_naissance, classe=classe)
+        return redirect('liste_eleves')
+    return render(request, 'ajouter_eleve.html', {'classes': classes})

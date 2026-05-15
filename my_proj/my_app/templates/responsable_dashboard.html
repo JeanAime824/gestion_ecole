@@ -1,2 +1,26 @@
-<h2>Dashboard Responsable</h2>
-<p>Bienvenue {{ user.username }}</p>
+{% extends "base.html" %}
+
+{% block title %}Dashboard Responsable{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Dashboard Responsable</h2>
+            <p class="lead">Bienvenue, {{ user.username }} !</p>
+            <hr>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Élèves</h5>
+                    <p class="card-text">Gérer les élèves de l'école.</p>
+                    <a href="{% url 'liste_eleves' %}" class="btn btn-light">Voir les élèves</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
