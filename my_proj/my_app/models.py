@@ -43,3 +43,19 @@ class Utilisateur(AbstractUser):
 
     def __str__(self):
         return f"{self.username} ({self.role})"
+
+class Classe(models.Model):
+    nom = models.CharField(max_length=50)
+    niveau = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.nom} ({self.niveau})"
+
+class Eleve(models.Model):
+    nom = models.CharField(max_length=100)
+    prenom = models.CharField(max_length=100)
+    date_naissance = models.DateField()
+    classe = models.ForeignKey(Classe, on_delete=models.CASCADE, related_name='eleves')
+
+    def __str__(self):
+        return f"{self.nom} {self.prenom}"

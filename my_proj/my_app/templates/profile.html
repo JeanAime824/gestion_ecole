@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Profil - {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Mon Profil</h3>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-4 fw-bold">Nom d'utilisateur:</div>
+                    <div class="col-sm-8">{{ user.username }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 fw-bold">Rôle:</div>
+                    <div class="col-sm-8 text-capitalize">{{ user.role }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 fw-bold">Contact:</div>
+                    <div class="col-sm-8">{{ user.contact|default:"Non renseigné" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 fw-bold">Sexe:</div>
+                    <div class="col-sm-8 text-capitalize">{{ user.sexe|default:"Non renseigné" }}</div>
+                </div>
+                <hr>
+                <div class="d-grid">
+                    <a href="{% if user.role == 'administrateur' %}{% url 'admin_dashboard' %}{% else %}{% url 'responsable_dashboard' %}{% endif %}" class="btn btn-secondary">Retour au Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
