@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Enregistrer un Paiement{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow mt-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Nouveau Paiement</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="eleve" class="form-label">Élève</label>
+                        <select name="eleve" id="eleve" class="form-select" required>
+                            <option value="">Sélectionnez un élève</option>
+                            {% for eleve in eleves %}
+                            <option value="{{ eleve.id }}">{{ eleve.nom }} {{ eleve.prenom }} ({{ eleve.classe.nom }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="montant" class="form-label">Montant (FCFA)</label>
+                        <input type="number" step="0.01" name="montant" id="montant" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="type_paiement" class="form-label">Type de Paiement</label>
+                        <select name="type_paiement" id="type_paiement" class="form-select" required>
+                            {% for code, name in types %}
+                            <option value="{{ code }}">{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="commentaire" class="form-label">Commentaire (Optionnel)</label>
+                        <textarea name="commentaire" id="commentaire" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        <a href="{% url 'liste_paiements' %}" class="btn btn-secondary">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

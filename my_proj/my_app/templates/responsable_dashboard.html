@@ -13,11 +13,32 @@
     </div>
     <div class="row mt-4">
         <div class="col-md-4">
-            <div class="card text-white bg-success mb-3">
+            <div class="card border-left-success shadow h-100 py-2">
                 <div class="card-body">
-                    <h5 class="card-title">Élèves</h5>
-                    <p class="card-text">Gérer les élèves de l'école.</p>
-                    <a href="{% url 'liste_eleves' %}" class="btn btn-light">Voir les élèves</a>
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Élèves</div>
+                            <a href="{% url 'liste_eleves' %}" class="btn btn-sm btn-success">Gérer les élèves</a>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-person-fill fa-2x text-gray-300" style="font-size: 2rem; color: #ccc;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Notes</div>
+                            <a href="{% url 'liste_notes' %}" class="btn btn-sm btn-info text-white">Gérer les notes</a>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-journal-check fa-2x text-gray-300" style="font-size: 2rem; color: #ccc;"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

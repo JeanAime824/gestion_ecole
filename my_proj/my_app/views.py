@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import Sum, Avg, Count
 from .forms import ConnexionForm, ResponsableCreationForm
-from .models import Classe, Eleve, Utilisateur
+from .models import Classe, Eleve, Utilisateur, Paiement, Note
 
 # Vérifie si l'utilisateur est admin
 def is_admin(user):
@@ -112,3 +113,78 @@ def ajouter_eleve(request):
         Eleve.objects.create(nom=nom, prenom=prenom, date_naissance=date_naissance, classe=classe)
         return redirect('liste_eleves')
     return render(request, 'ajouter_eleve.html', {'classes': classes})
+
+# --- GESTION DES PAIEMENTS (ECOLAGE) ---
+@login_required
+def liste_paiements(request):
+    paiements = Paiement.objects.all().order_by('-date_paiement')
+    return render(request, 'liste_paiements.html', {'paiements': paiements})
+
+@login_required
+def ajouter_paiement(request):
+    eleves = Eleve.objects.all()
+    if request.method == "POST":
+        eleve_id = request.POST.get('eleve')
+        montant = request.POST.get('montant')
+        type_p = request.POST.get('type_paiement')
+        commentaire = request.POST.get('commentaire')
+
+        eleve = get_object_or_404(Eleve, id=eleve_id)
+        Paiement.objects.create(
+            eleve=eleve,
+            montant=montant,
+            type_paiement=type_p,
+            commentaire=commentaire
+        )
+        return redirect('liste_paiements')
+
+    types = Paiement.TYPES
+    return render(request, 'ajouter_paiement.html', {'eleves': eleves, 'types': types})
+
+# --- GESTION DES NOTES ---
+@login_required
+def liste_notes(request):
+    notes = Note.objects.all().order_by('-date_evaluation')
+    return render(request, 'liste_notes.html', {'notes': notes})
+
+@login_required
+def ajouter_note(request):
+    eleves = Eleve.objects.all()
+    if request.method == "POST":
+        eleve_id = request.POST.get('eleve')
+        matiere = request.POST.get('matiere')
+        valeur = request.POST.get('valeur')
+        date_e = request.POST.get('date_evaluation')
+
+        eleve = get_object_or_404(Eleve, id=eleve_id)
+        Note.objects.create(
+            eleve=eleve,
+            matiere=matiere,
+            valeur=valeur,
+            date_evaluation=date_e
+        )
+        return redirect('liste_notes')
+    return render(request, 'ajouter_note.html', {'eleves': eleves})
+
+# --- RAPPORTS ET STATISTIQUES (ADMIN) ---
+@login_required
+@user_passes_test(is_admin)
+def rapports_view(request):
+    total_eleves = Eleve.objects.count()
+    total_paiements = Paiement.objects.aggregate(Sum('montant'))['montant__sum'] or 0
+    moyenne_generale = Note.objects.aggregate(Avg('valeur'))['valeur__avg'] or 0
+
+    # Répartition par classe
+    repartition_classe = Classe.objects.annotate(nb_eleves=Count('eleves'))
+
+    # Derniers paiements
+    derniers_paiements = Paiement.objects.all().order_by('-date_paiement')[:5]
+
+    context = {
+        'total_eleves': total_eleves,
+        'total_paiements': total_paiements,
+        'moyenne_generale': round(moyenne_generale, 2),
+        'repartition_classe': repartition_classe,
+        'derniers_paiements': derniers_paiements,
+    }
+    return render(request, 'rapports.html', context)

@@ -59,3 +59,27 @@ class Eleve(models.Model):
 
     def __str__(self):
         return f"{self.nom} {self.prenom}"
+
+class Paiement(models.Model):
+    TYPES = [
+        ('frais_inscription', 'Frais d\'inscription'),
+        ('ecolage', 'Écolage'),
+        ('autre', 'Autre'),
+    ]
+    eleve = models.ForeignKey(Eleve, on_delete=models.CASCADE, related_name='paiements')
+    montant = models.DecimalField(max_digits=10, decimal_places=2)
+    date_paiement = models.DateField(auto_now_add=True)
+    type_paiement = models.CharField(max_length=20, choices=TYPES)
+    commentaire = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.eleve} - {self.montant} ({self.type_paiement})"
+
+class Note(models.Model):
+    eleve = models.ForeignKey(Eleve, on_delete=models.CASCADE, related_name='notes')
+    matiere = models.CharField(max_length=100)
+    valeur = models.DecimalField(max_digits=5, decimal_places=2)
+    date_evaluation = models.DateField()
+
+    def __str__(self):
+        return f"{self.eleve} - {self.matiere}: {self.valeur}"
