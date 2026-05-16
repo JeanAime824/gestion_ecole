@@ -3,37 +3,41 @@
 {% block title %}Ajouter un Élève{% endblock %}
 
 {% block content %}
+<style>
+    .form-control, .form-select {
+        background-color: #0f172a;
+        border: 1px solid #334155;
+        color: #f8fafc;
+    }
+    .form-control:focus, .form-select:focus {
+        background-color: #0f172a;
+        border-color: #3b82f6;
+        color: #f8fafc;
+        box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+    }
+</style>
+
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card mt-4">
-            <div class="card-body">
-                <h2 class="card-title text-center mb-4">Ajouter un Élève</h2>
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Nouveau Élève</h5>
+            </div>
+            <div class="card-body p-4">
                 <form method="post">
                     {% csrf_token %}
+                    {% for field in form %}
                     <div class="mb-3">
-                        <label for="nom" class="form-label">Nom</label>
-                        <input type="text" name="nom" id="nom" class="form-control" required>
+                        <label class="form-label text-muted small text-uppercase">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="text-danger small mt-1">{{ field.errors }}</div>
+                        {% endif %}
                     </div>
-                    <div class="mb-3">
-                        <label for="prenom" class="form-label">Prénom</label>
-                        <input type="text" name="prenom" id="prenom" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="date_naissance" class="form-label">Date de Naissance</label>
-                        <input type="date" name="date_naissance" id="date_naissance" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="classe" class="form-label">Classe</label>
-                        <select name="classe" id="classe" class="form-control" required>
-                            <option value="">Sélectionnez une classe</option>
-                            {% for classe in classes %}
-                            <option value="{{ classe.id }}">{{ classe.nom }} ({{ classe.niveau }})</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-success">Ajouter</button>
-                        <a href="{% url 'liste_eleves' %}" class="btn btn-secondary">Annuler</a>
+                    {% endfor %}
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary px-4">Enregistrer</button>
+                        <a href="{% url 'liste_eleves' %}" class="btn btn-outline-light px-4">Annuler</a>
                     </div>
                 </form>
             </div>

@@ -3,75 +3,128 @@
 {% block title %}Dashboard Administrateur{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <h2>Dashboard Administrateur</h2>
-            <p class="lead">Bienvenue, {{ user.username }} !</p>
-            <hr>
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="mb-1">Vue d'ensemble de TRACE ERP</h4>
+        <p class="text-muted">Bienvenue, {{ user.get_full_name|default:user.username }}</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card metric-card">
+            <div class="metric-label">Total Élèves</div>
+            <div class="metric-value">{{ total_eleves }}</div>
+            <div class="metric-icon"><i class="bi bi-people"></i></div>
         </div>
     </div>
-    <div class="row mt-4">
-        <div class="col-md-3">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Responsables</div>
-                            <a href="{% url 'ajouter_responsable' %}" class="btn btn-sm btn-primary">Gérer</a>
-                        </div>
-                        <div class="col-auto">
-                            <i class="bi bi-people-fill fa-2x text-gray-300" style="font-size: 2rem; color: #ccc;"></i>
-                        </div>
-                    </div>
-                </div>
+    <div class="col-md-3">
+        <div class="card metric-card border-start border-primary border-4">
+            <div class="metric-label">Recettes Totales</div>
+            <div class="metric-value text-primary">{{ total_paiements }} <small style="font-size: 0.6em;">FCFA</small></div>
+            <div class="metric-icon"><i class="bi bi-cash-stack"></i></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card border-start border-success border-4">
+            <div class="metric-label">Classes Actives</div>
+            <div class="metric-value text-success">{{ total_classes }}</div>
+            <div class="metric-icon"><i class="bi bi-door-open"></i></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card metric-card border-start border-info border-4">
+            <div class="metric-label">Moyenne Générale</div>
+            <div class="metric-value text-info">{{ moyenne_generale }}/20</div>
+            <div class="metric-icon"><i class="bi bi-journal-check"></i></div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Évolution des Revenus</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="revenueChart" height="250"></canvas>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Classes</div>
-                            <a href="{% url 'liste_classes' %}" class="btn btn-sm btn-success">Gérer</a>
-                        </div>
-                        <div class="col-auto">
-                            <i class="bi bi-door-open-fill fa-2x text-gray-300" style="font-size: 2rem; color: #ccc;"></i>
-                        </div>
-                    </div>
-                </div>
+    </div>
+    <div class="col-md-5">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Répartition par Classe</h5>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Élèves</div>
-                            <a href="{% url 'liste_eleves' %}" class="btn btn-sm btn-info text-white">Gérer</a>
-                        </div>
-                        <div class="col-auto">
-                            <i class="bi bi-person-fill fa-2x text-gray-300" style="font-size: 2rem; color: #ccc;"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Écolage</div>
-                            <a href="{% url 'liste_paiements' %}" class="btn btn-sm btn-warning text-white">Paiements</a>
-                        </div>
-                        <div class="col-auto">
-                            <i class="bi bi-cash-stack fa-2x text-gray-300" style="font-size: 2rem; color: #ccc;"></i>
-                        </div>
-                    </div>
-                </div>
+            <div class="card-body d-flex align-items-center">
+                <canvas id="classChart"></canvas>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const labelsClasses = {{ labels_classes|safe }};
+        const dataClasses = {{ data_classes|safe }};
+        const labelsRevenus = {{ labels_revenus|safe }};
+        const dataRevenus = {{ data_revenus|safe }};
+
+        // Graphique de répartition par classe (Doughnut)
+        new Chart(document.getElementById('classChart'), {
+            type: 'doughnut',
+            data: {
+                labels: labelsClasses,
+                datasets: [{
+                    data: dataClasses,
+                    backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#94a3b8', usePointStyle: true }
+                    }
+                }
+            }
+        });
+
+        // Graphique d'évolution des revenus (Line)
+        new Chart(document.getElementById('revenueChart'), {
+            type: 'line',
+            data: {
+                labels: labelsRevenus,
+                datasets: [{
+                    label: 'Revenus (FCFA)',
+                    data: dataRevenus,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#334155' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}

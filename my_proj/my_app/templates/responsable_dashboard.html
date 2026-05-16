@@ -3,42 +3,49 @@
 {% block title %}Dashboard Responsable{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <h2>Dashboard Responsable</h2>
-            <p class="lead">Bienvenue, {{ user.username }} !</p>
-            <hr>
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="mb-1">Espace Responsable</h4>
+        <p class="text-muted">Bienvenue, {{ user.get_full_name|default:user.username }}</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card metric-card">
+            <div class="metric-label">Élèves Totaux</div>
+            <div class="metric-value">{{ total_eleves }}</div>
+            <div class="metric-icon"><i class="bi bi-people"></i></div>
         </div>
     </div>
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Élèves</div>
-                            <a href="{% url 'liste_eleves' %}" class="btn btn-sm btn-success">Gérer les élèves</a>
-                        </div>
-                        <div class="col-auto">
-                            <i class="bi bi-person-fill fa-2x text-gray-300" style="font-size: 2rem; color: #ccc;"></i>
-                        </div>
-                    </div>
-                </div>
+    <div class="col-md-4">
+        <div class="card metric-card border-start border-primary border-4">
+            <div class="metric-label">Actions Rapides</div>
+            <div class="mt-2">
+                <a href="{% url 'ajouter_eleve' %}" class="btn btn-sm btn-primary w-100 mb-2">Ajouter un élève</a>
+                <a href="{% url 'ajouter_note' %}" class="btn btn-sm btn-outline-light w-100">Ajouter une note</a>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Notes</div>
-                            <a href="{% url 'liste_notes' %}" class="btn btn-sm btn-info text-white">Gérer les notes</a>
-                        </div>
-                        <div class="col-auto">
-                            <i class="bi bi-journal-check fa-2x text-gray-300" style="font-size: 2rem; color: #ccc;"></i>
-                        </div>
-                    </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Ressources</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'liste_eleves' %}" class="list-group-item list-group-item-action bg-transparent text-main border-secondary">
+                        <i class="bi bi-person-badge me-2"></i> Liste des élèves
+                    </a>
+                    <a href="{% url 'liste_notes' %}" class="list-group-item list-group-item-action bg-transparent text-main border-secondary">
+                        <i class="bi bi-journal-check me-2"></i> Liste des notes
+                    </a>
+                    <a href="{% url 'liste_paiements' %}" class="list-group-item list-group-item-action bg-transparent text-main border-secondary">
+                        <i class="bi bi-cash-stack me-2"></i> Historique paiements
+                    </a>
                 </div>
             </div>
         </div>

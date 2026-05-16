@@ -1,8 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from .models import Utilisateur
+from .models import Utilisateur, Classe, Eleve, Paiement, Note
 
-# Formulaire de connexion
 class ConnexionForm(AuthenticationForm):
     ROLE_CHOICES = [
         ('admin', 'Administrateur'),
@@ -12,13 +11,54 @@ class ConnexionForm(AuthenticationForm):
     password = forms.CharField(label="Mot de passe", widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     role = forms.ChoiceField(label="Type de compte", choices=ROLE_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
 
-# Formulaire de création de responsable (admin uniquement)
 class ResponsableCreationForm(UserCreationForm):
     class Meta:
         model = Utilisateur
-        fields = ['username', 'nom', 'prenom', 'sexe', 'contact', 'password1', 'password2']
+        fields = ['username', 'nom', 'prenom', 'sexe', 'contact']
 
     nom = forms.CharField(label="Nom", widget=forms.TextInput(attrs={'class': 'form-control'}))
     prenom = forms.CharField(label="Prénom", widget=forms.TextInput(attrs={'class': 'form-control'}))
     sexe = forms.ChoiceField(label="Sexe", choices=Utilisateur.SEXE, widget=forms.Select(attrs={'class': 'form-control'}))
     contact = forms.CharField(label="Contact", widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+class ClasseForm(forms.ModelForm):
+    class Meta:
+        model = Classe
+        fields = ['nom', 'niveau']
+        widgets = {
+            'nom': forms.TextInput(attrs={'class': 'form-control'}),
+            'niveau': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+class EleveForm(forms.ModelForm):
+    class Meta:
+        model = Eleve
+        fields = ['nom', 'prenom', 'date_naissance', 'classe']
+        widgets = {
+            'nom': forms.TextInput(attrs={'class': 'form-control'}),
+            'prenom': forms.TextInput(attrs={'class': 'form-control'}),
+            'date_naissance': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'classe': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+class PaiementForm(forms.ModelForm):
+    class Meta:
+        model = Paiement
+        fields = ['eleve', 'montant', 'type_paiement', 'commentaire']
+        widgets = {
+            'eleve': forms.Select(attrs={'class': 'form-control'}),
+            'montant': forms.NumberInput(attrs={'class': 'form-control'}),
+            'type_paiement': forms.Select(attrs={'class': 'form-control'}),
+            'commentaire': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+
+class NoteForm(forms.ModelForm):
+    class Meta:
+        model = Note
+        fields = ['eleve', 'matiere', 'valeur', 'date_evaluation']
+        widgets = {
+            'eleve': forms.Select(attrs={'class': 'form-control'}),
+            'matiere': forms.TextInput(attrs={'class': 'form-control'}),
+            'valeur': forms.NumberInput(attrs={'class': 'form-control', 'min': 0, 'max': 20}),
+            'date_evaluation': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+        }
