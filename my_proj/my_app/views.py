@@ -2,44 +2,39 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Sum, Avg, Count
-from .forms import ConnexionForm, ResponsableCreationForm
+from django.db.models.functions import TruncMonth
+from .forms import (
+    ConnexionForm, ResponsableCreationForm, ClasseForm,
+    EleveForm, PaiementForm, NoteForm
+)
 from .models import Classe, Eleve, Utilisateur, Paiement, Note
+import json
 
-# Vérifie si l'utilisateur est admin
 def is_admin(user):
-    return user.role == 'administrateur'
+    return user.role == 'administrateur' or user.is_superuser
 
-# Vue de connexion avec redirection selon le rôle
 def connexion_view(request):
     if request.method == "POST":
         form = ConnexionForm(request, data=request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            role = form.cleaned_data['role']  # Récupération du choix
-
             user = authenticate(request, username=username, password=password)
 
             if user is not None:
                 login(request, user)
-
-                # Redirection basée sur le rôle réel en base
                 if user.role == "administrateur" or user.is_superuser:
                     return redirect('admin_dashboard')
                 elif user.role == "responsable":
                     return redirect('responsable_dashboard')
                 else:
-                    # Cas où le rôle n'est pas défini
                     form.add_error(None, "Le rôle de cet utilisateur n'est pas défini.")
             else:
                 form.add_error(None, "Nom d'utilisateur ou mot de passe incorrect.")
     else:
         form = ConnexionForm()
-
     return render(request, 'login.html', {'form': form})
 
-
-# Vue pour ajouter un responsable (admin seulement)
 @login_required
 @user_passes_test(is_admin)
 def ajouter_responsable(request):
@@ -52,33 +47,56 @@ def ajouter_responsable(request):
             return redirect('admin_dashboard')
     else:
         form = ResponsableCreationForm()
-
     return render(request, 'ajouter_responsable.html', {'form': form})
 
-# Dashboard admin
 @login_required
-#@user_passes_test(is_admin)
 def admin_dashboard(request):
-    return render(request, 'admin_dashboard.html')
+    if not is_admin(request.user):
+        return redirect('responsable_dashboard')
 
-# Dashboard responsable
+    total_eleves = Eleve.objects.count()
+    total_paiements = Paiement.objects.aggregate(Sum('montant'))['montant__sum'] or 0
+    total_classes = Classe.objects.count()
+    moyenne_generale = Note.objects.aggregate(Avg('valeur'))['valeur__avg'] or 0
+
+    stats_classes = Classe.objects.annotate(nb_eleves=Count('eleves'))
+    labels_classes = [c.nom for c in stats_classes]
+    data_classes = [c.nb_eleves for c in stats_classes]
+
+    paiements_mensuels = Paiement.objects.annotate(month=TruncMonth('date_paiement')) \
+        .values('month').annotate(total=Sum('montant')).order_by('month')
+
+    labels_revenus = [p['month'].strftime("%b %Y") for p in paiements_mensuels]
+    data_revenus = [float(p['total']) for p in paiements_mensuels]
+
+    context = {
+        'total_eleves': total_eleves,
+        'total_paiements': total_paiements,
+        'total_classes': total_classes,
+        'moyenne_generale': round(moyenne_generale, 2),
+        'labels_classes': json.dumps(labels_classes),
+        'data_classes': json.dumps(data_classes),
+        'labels_revenus': json.dumps(labels_revenus),
+        'data_revenus': json.dumps(data_revenus),
+    }
+    return render(request, 'admin_dashboard.html', context)
+
 @login_required
 def responsable_dashboard(request):
     if request.user.role != "responsable":
-        return redirect('login')
-    return render(request, 'responsable_dashboard.html')
+        return redirect('admin_dashboard')
+    total_eleves = Eleve.objects.count()
+    return render(request, 'responsable_dashboard.html', {'total_eleves': total_eleves})
 
-# Vue de déconnexion
 def deconnexion_view(request):
     logout(request)
     return redirect('login')
 
-# Vue de profil
 @login_required
 def profile_view(request):
     return render(request, 'profile.html')
 
-# --- GESTION DES CLASSES (ADMIN) ---
+# --- GESTION DES CLASSES ---
 @login_required
 @user_passes_test(is_admin)
 def liste_classes(request):
@@ -89,13 +107,15 @@ def liste_classes(request):
 @user_passes_test(is_admin)
 def ajouter_classe(request):
     if request.method == "POST":
-        nom = request.POST.get('nom')
-        niveau = request.POST.get('niveau')
-        Classe.objects.create(nom=nom, niveau=niveau)
-        return redirect('liste_classes')
-    return render(request, 'ajouter_classe.html')
+        form = ClasseForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('liste_classes')
+    else:
+        form = ClasseForm()
+    return render(request, 'ajouter_classe.html', {'form': form})
 
-# --- GESTION DES ÉLÈVES (RESPONSABLE & ADMIN) ---
+# --- GESTION DES ÉLÈVES ---
 @login_required
 def liste_eleves(request):
     eleves = Eleve.objects.all()
@@ -103,18 +123,16 @@ def liste_eleves(request):
 
 @login_required
 def ajouter_eleve(request):
-    classes = Classe.objects.all()
     if request.method == "POST":
-        nom = request.POST.get('nom')
-        prenom = request.POST.get('prenom')
-        date_naissance = request.POST.get('date_naissance')
-        classe_id = request.POST.get('classe')
-        classe = get_object_or_404(Classe, id=classe_id)
-        Eleve.objects.create(nom=nom, prenom=prenom, date_naissance=date_naissance, classe=classe)
-        return redirect('liste_eleves')
-    return render(request, 'ajouter_eleve.html', {'classes': classes})
+        form = EleveForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('liste_eleves')
+    else:
+        form = EleveForm()
+    return render(request, 'ajouter_eleve.html', {'form': form})
 
-# --- GESTION DES PAIEMENTS (ECOLAGE) ---
+# --- GESTION DES PAIEMENTS ---
 @login_required
 def liste_paiements(request):
     paiements = Paiement.objects.all().order_by('-date_paiement')
@@ -122,24 +140,14 @@ def liste_paiements(request):
 
 @login_required
 def ajouter_paiement(request):
-    eleves = Eleve.objects.all()
     if request.method == "POST":
-        eleve_id = request.POST.get('eleve')
-        montant = request.POST.get('montant')
-        type_p = request.POST.get('type_paiement')
-        commentaire = request.POST.get('commentaire')
-
-        eleve = get_object_or_404(Eleve, id=eleve_id)
-        Paiement.objects.create(
-            eleve=eleve,
-            montant=montant,
-            type_paiement=type_p,
-            commentaire=commentaire
-        )
-        return redirect('liste_paiements')
-
-    types = Paiement.TYPES
-    return render(request, 'ajouter_paiement.html', {'eleves': eleves, 'types': types})
+        form = PaiementForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('liste_paiements')
+    else:
+        form = PaiementForm()
+    return render(request, 'ajouter_paiement.html', {'form': form})
 
 # --- GESTION DES NOTES ---
 @login_required
@@ -149,24 +157,16 @@ def liste_notes(request):
 
 @login_required
 def ajouter_note(request):
-    eleves = Eleve.objects.all()
     if request.method == "POST":
-        eleve_id = request.POST.get('eleve')
-        matiere = request.POST.get('matiere')
-        valeur = request.POST.get('valeur')
-        date_e = request.POST.get('date_evaluation')
+        form = NoteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('liste_notes')
+    else:
+        form = NoteForm()
+    return render(request, 'ajouter_note.html', {'form': form})
 
-        eleve = get_object_or_404(Eleve, id=eleve_id)
-        Note.objects.create(
-            eleve=eleve,
-            matiere=matiere,
-            valeur=valeur,
-            date_evaluation=date_e
-        )
-        return redirect('liste_notes')
-    return render(request, 'ajouter_note.html', {'eleves': eleves})
-
-# --- RAPPORTS ET STATISTIQUES (ADMIN) ---
+# --- RAPPORTS ET STATISTIQUES ---
 @login_required
 @user_passes_test(is_admin)
 def rapports_view(request):
@@ -174,10 +174,7 @@ def rapports_view(request):
     total_paiements = Paiement.objects.aggregate(Sum('montant'))['montant__sum'] or 0
     moyenne_generale = Note.objects.aggregate(Avg('valeur'))['valeur__avg'] or 0
 
-    # Répartition par classe
     repartition_classe = Classe.objects.annotate(nb_eleves=Count('eleves'))
-
-    # Derniers paiements
     derniers_paiements = Paiement.objects.all().order_by('-date_paiement')[:5]
 
     context = {

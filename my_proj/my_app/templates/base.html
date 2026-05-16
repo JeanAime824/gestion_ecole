@@ -3,44 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Gestion École{% endblock %}</title>
+    <title>{% block title %}Gestion École{% endblock %} - TRACE ERP</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .navbar { margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,.1); }
-        .card { border: none; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); transition: transform 0.2s; }
-        .card:hover { transform: translateY(-5px); }
-        .btn-primary { background-color: #4e73df; border-color: #4e73df; }
-        .bg-primary { background-color: #4e73df !important; }
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --sidebar-bg: #111827;
+            --accent-color: #3b82f6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+        #sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid #1e293b;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+        }
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .sidebar-header {
+            padding: 1.5rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-link {
+            color: var(--text-muted);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+            border-radius: 8px;
+            margin: 0.2rem 1rem;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: var(--text-main);
+            background-color: var(--accent-color);
+        }
+        .nav-link i { font-size: 1.1rem; }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 1rem;
+            border-top: 1px solid #1e293b;
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.5rem;
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .user-info { font-size: 0.85rem; }
+        .user-info .name { display: block; font-weight: 600; }
+        .user-info .role { display: block; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            color: var(--text-main);
+        }
+        .card-header { border-bottom: 1px solid #334155; background: transparent; padding: 1.25rem; }
+
+        .metric-card {
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .metric-icon {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2.5rem;
+            opacity: 0.2;
+        }
+        .metric-value { font-size: 1.75rem; font-weight: 700; margin: 0.5rem 0; }
+        .metric-label { color: var(--text-muted); font-size: 0.875rem; }
+
+        .btn-primary { background-color: var(--accent-color); border: none; }
+        .table { color: var(--text-main); }
+        .table thead th { border-bottom-color: #334155; color: var(--text-muted); font-weight: 500; }
+        .table td { border-bottom-color: #1e293b; padding: 1rem 0.75rem; vertical-align: middle; }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            #sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; }
+            body.sidebar-open #sidebar { transform: translateX(0); }
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="/">Gestion École</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item"><a class="nav-link" href="{% if user.role == 'administrateur' %}{% url 'admin_dashboard' %}{% else %}{% url 'responsable_dashboard' %}{% endif %}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
-                        {% if user.role == 'administrateur' %}
-                            <li class="nav-item"><a class="nav-link" href="{% url 'rapports' %}"><i class="bi bi-graph-up"></i> Rapports</a></li>
-                        {% endif %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}"><i class="bi bi-person"></i> Profil</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Déconnexion</a></li>
-                    {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Connexion</a></li>
-                    {% endif %}
-                </ul>
+    <div class="wrapper">
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <i class="bi bi-mortarboard-fill text-primary"></i>
+                TRACE ERP
             </div>
-        </div>
-    </nav>
 
-    <div class="container">
-        {% block content %}{% endblock %}
+            <div class="nav flex-column mt-3">
+                {% if user.is_authenticated %}
+                    <a href="{% if user.role == 'administrateur' %}{% url 'admin_dashboard' %}{% else %}{% url 'responsable_dashboard' %}{% endif %}" class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' or request.resolver_match.url_name == 'responsable_dashboard' %}active{% endif %}">
+                        <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                    </a>
+
+                    {% if user.role == 'administrateur' %}
+                        <a href="{% url 'liste_classes' %}" class="nav-link {% if 'classe' in request.path %}active{% endif %}">
+                            <i class="bi bi-door-open"></i> Classes
+                        </a>
+                        <a href="{% url 'ajouter_responsable' %}" class="nav-link {% if 'responsable' in request.path and 'dashboard' not in request.path %}active{% endif %}">
+                            <i class="bi bi-people"></i> Personnels
+                        </a>
+                    {% endif %}
+
+                    <a href="{% url 'liste_eleves' %}" class="nav-link {% if 'eleve' in request.path %}active{% endif %}">
+                        <i class="bi bi-person-badge"></i> Élèves
+                    </a>
+
+                    <a href="{% url 'liste_paiements' %}" class="nav-link {% if 'paiement' in request.path %}active{% endif %}">
+                        <i class="bi bi-cash-stack"></i> Paiements
+                    </a>
+
+                    <a href="{% url 'liste_notes' %}" class="nav-link {% if 'note' in request.path %}active{% endif %}">
+                        <i class="bi bi-journal-check"></i> Notes
+                    </a>
+
+                    {% if user.role == 'administrateur' %}
+                        <a href="{% url 'rapports' %}" class="nav-link {% if 'rapports' in request.path %}active{% endif %}">
+                            <i class="bi bi-bar-chart-line"></i> Rapports
+                        </a>
+                    {% endif %}
+
+                    <a href="{% url 'profile' %}" class="nav-link {% if 'profile' in request.path %}active{% endif %}">
+                        <i class="bi bi-person-gear"></i> Paramètres
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="nav-link">
+                        <i class="bi bi-box-arrow-in-right"></i> Connexion
+                    </a>
+                {% endif %}
+            </div>
+
+            <div class="sidebar-footer">
+                {% if user.is_authenticated %}
+                    <div class="user-profile mb-3">
+                        <div class="user-avatar">
+                            {{ user.username|first|upper }}
+                        </div>
+                        <div class="user-info">
+                            <span class="name">{{ user.get_full_name|default:user.username }}</span>
+                            <span class="role">{{ user.role|upper }}</span>
+                        </div>
+                    </div>
+                    <a href="{% url 'logout' %}" class="nav-link text-danger m-0 p-2">
+                        <i class="bi bi-box-arrow-right"></i> Déconnexion
+                    </a>
+                {% endif %}
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="container-fluid">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -5,22 +5,22 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card mt-4">
-            <div class="card-body">
-                <h2 class="card-title text-center mb-4">Ajouter une Classe</h2>
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Nouvelle Classe</h5>
+            </div>
+            <div class="card-body p-4">
                 <form method="post">
                     {% csrf_token %}
+                    {% for field in form %}
                     <div class="mb-3">
-                        <label for="nom" class="form-label">Nom de la classe</label>
-                        <input type="text" name="nom" id="nom" class="form-control" required>
+                        <label class="form-label text-muted small text-uppercase">{{ field.label }}</label>
+                        {{ field }}
                     </div>
-                    <div class="mb-3">
-                        <label for="niveau" class="form-label">Niveau</label>
-                        <input type="text" name="niveau" id="niveau" class="form-control" required>
-                    </div>
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">Créer</button>
-                        <a href="{% url 'liste_classes' %}" class="btn btn-secondary">Annuler</a>
+                    {% endfor %}
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary px-4">Enregistrer</button>
+                        <a href="{% url 'liste_classes' %}" class="btn btn-outline-light px-4">Annuler</a>
                     </div>
                 </form>
             </div>
