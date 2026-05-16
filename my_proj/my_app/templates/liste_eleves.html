@@ -3,14 +3,37 @@
 {% block title %}Liste des Élèves{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0">Gestion des Élèves</h2>
-    <a href="{% url 'ajouter_eleve' %}" class="btn btn-primary px-4">
-        <i class="bi bi-plus-lg me-2"></i> Ajouter un élève
-    </a>
+<div class="page-header mb-4">
+    <div>
+        <h1>Élèves</h1>
+        <p class="text-muted">Suivez le carnet d’élèves et leur répartition par classe.</p>
+    </div>
+    <form method="get" class="d-flex align-items-center gap-2">
+        <select name="classe" class="form-select form-select-sm" style="width:220px;" onchange="this.form.submit()">
+            <option value="">Toutes les classes</option>
+            {% for c in classes %}
+                <option value="{{ c.id }}" {% if current_classe and current_classe|stringformat:'s' == c.id|stringformat:'s' %}selected{% endif %}>{{ c.nom }}</option>
+            {% endfor %}
+        </select>
+
+        <input id="eleveSearch" name="q" value="{{ q }}" type="search" class="form-control form-control-sm" placeholder="Rechercher un élève ou une classe" style="width: 260px;" />
+
+        <button type="submit" class="btn btn-outline-light btn-sm">Rechercher</button>
+
+        <a href="{% url 'export_eleves_csv' %}{% if current_classe or q %}?{% endif %}{% if current_classe %}classe={{ current_classe }}{% endif %}{% if current_classe and q %}&{% endif %}{% if q %}q={{ q|urlencode }}{% endif %}" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-download me-2"></i> Export CSV
+        </a>
+        <a href="{% url 'export_eleves_xlsx' %}{% if current_classe or q %}?{% endif %}{% if current_classe %}classe={{ current_classe }}{% endif %}{% if current_classe and q %}&{% endif %}{% if q %}q={{ q|urlencode }}{% endif %}" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-file-earmark-spreadsheet me-2"></i> Export Excel
+        </a>
+
+        <a href="{% url 'ajouter_eleve' %}" class="btn btn-primary px-4">
+            <i class="bi bi-plus-lg me-2"></i> Ajouter un élève
+        </a>
+    </form>
 </div>
 
-<div class="card">
+<div class="card shadow-sm border-0">
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table mb-0">
@@ -38,7 +61,9 @@
                         <td>{{ eleve.date_naissance }}</td>
                         <td><span class="badge bg-secondary">{{ eleve.classe.nom }}</span></td>
                         <td class="text-end pe-4">
-                            <button class="btn btn-sm btn-outline-light"><i class="bi bi-pencil"></i></button>
+                            <a href="#" class="btn btn-sm btn-outline-light me-1"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'export_eleve_detail_csv' eleve.id %}" class="btn btn-sm btn-outline-light me-1" title="Exporter détails CSV"><i class="bi bi-download"></i></a>
+                            <a href="{% url 'export_eleve_detail_xlsx' eleve.id %}" class="btn btn-sm btn-outline-light" title="Exporter détails Excel"><i class="bi bi-file-earmark-spreadsheet"></i></a>
                         </td>
                     </tr>
                     {% empty %}
@@ -51,4 +76,34 @@
         </div>
     </div>
 </div>
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>
+            {% if page_obj.has_other_pages %}
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_classe %}&classe={{ current_classe }}{% endif %}{% if q %}&q={{ q|urlencode }}{% endif %}">Préc</a></li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">Préc</span></li>
+                        {% endif %}
+
+                        {% for p in page_obj.paginator.page_range %}
+                            {% if p == page_obj.number %}
+                                <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ p }}{% if current_classe %}&classe={{ current_classe }}{% endif %}{% if q %}&q={{ q|urlencode }}{% endif %}">{{ p }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_classe %}&classe={{ current_classe }}{% endif %}{% if q %}&q={{ q|urlencode }}{% endif %}">Suiv</a></li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">Suiv</span></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        </div>
+        <div class="text-muted small">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</div>
+    </div>
 {% endblock %}

@@ -3,126 +3,361 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Gestion École{% endblock %} - TRACE ERP</title>
+    <title>{% block title %}Gestion École{% endblock %} - Campus</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --sidebar-bg: #111827;
-            --accent-color: #3b82f6;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --bg-color: #08101f;
+            --surface: #102039;
+            --card-bg: #15203a;
+            --sidebar-bg: #0b1628;
+            --accent-color: #5b81ff;
+            --accent-soft: rgba(91, 129, 255, 0.18);
+            --text-main: #eef2ff;
+            --text-muted: rgba(255,255,255,0.70);
+            --text-muted-weak: rgba(255,255,255,0.48);
+            --border-color: rgba(255, 255, 255, 0.08);
         }
+
+        /* Light theme variables when [data-theme="light"] is set on <html> */
+        html[data-theme="light"] {
+            --bg-color: #f7fafc;
+            --surface: #ffffff;
+            --card-bg: #ffffff;
+            --sidebar-bg: #f1f5f9;
+            --accent-color: #2563eb;
+            --accent-soft: rgba(37,99,235,0.12);
+            --text-main: #0f172a;
+            --text-muted: rgba(15,23,42,0.65);
+            --text-muted-weak: rgba(15,23,42,0.45);
+            --border-color: rgba(15,23,42,0.06);
+        }
+
+        * { box-sizing: border-box; }
         body {
-            background-color: var(--bg-color);
+            background: radial-gradient(circle at top, rgba(91, 129, 255, 0.12), transparent 35%), var(--bg-color);
             color: var(--text-main);
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
             margin: 0;
+            min-height: 100vh;
             overflow-x: hidden;
         }
+
         .wrapper {
             display: flex;
             min-height: 100vh;
         }
+
         #sidebar {
-            width: 260px;
+            width: 280px;
             background-color: var(--sidebar-bg);
-            border-right: 1px solid #1e293b;
+            border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             position: fixed;
             height: 100vh;
             z-index: 1000;
+            padding-bottom: 1.5rem;
         }
+
         .main-content {
             flex: 1;
-            margin-left: 260px;
-            padding: 2rem;
+            margin-left: 280px;
+            padding: 2rem 2.5rem;
             min-height: 100vh;
         }
+
         .sidebar-header {
-            padding: 1.5rem;
-            font-weight: 700;
-            font-size: 1.25rem;
+            padding: 1.8rem 1.5rem;
+            font-weight: 800;
+            font-size: 1.35rem;
             color: var(--text-main);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
         }
+
         .nav-link {
             color: var(--text-muted);
-            padding: 0.75rem 1.5rem;
+            padding: 0.85rem 1.4rem;
             display: flex;
             align-items: center;
-            gap: 12px;
-            transition: all 0.2s;
-            border-radius: 8px;
-            margin: 0.2rem 1rem;
+            gap: 0.95rem;
+            transition: all 0.2s ease;
+            border-radius: 12px;
+            margin: 0.35rem 1rem;
+            font-size: 0.96rem;
         }
-        .nav-link:hover, .nav-link.active {
+
+        .nav-link:hover {
             color: var(--text-main);
-            background-color: var(--accent-color);
+            background-color: rgba(255,255,255,0.05);
         }
-        .nav-link i { font-size: 1.1rem; }
+
+        .nav-link.active {
+            color: var(--text-main);
+            background-color: var(--accent-soft);
+            border-left: 4px solid var(--accent-color);
+            margin-left: 0.7rem;
+            padding-left: 1.1rem;
+        }
+
+        .nav-link i { font-size: 1.15rem; }
 
         .sidebar-footer {
             margin-top: auto;
-            padding: 1rem;
-            border-top: 1px solid #1e293b;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
         }
+
         .user-profile {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 0.5rem;
+            gap: 0.85rem;
+            padding: 0.6rem 0;
         }
+
         .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: var(--accent-color);
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #5b81ff 0%, #76b7ff 100%);
             border-radius: 50%;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
+            font-weight: 700;
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(91,129,255,0.18);
         }
+
         .user-info { font-size: 0.85rem; }
-        .user-info .name { display: block; font-weight: 600; }
-        .user-info .role { display: block; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; }
+        .user-info .name { display: block; font-weight: 700; }
+        .user-info .role { display: block; color: var(--text-muted); font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.08em; }
 
         .card {
             background-color: var(--card-bg);
-            border: 1px solid #334155;
-            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 1rem;
             color: var(--text-main);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.15);
         }
-        .card-header { border-bottom: 1px solid #334155; background: transparent; padding: 1.25rem; }
+
+        .card-header {
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            background: transparent;
+            padding: 1.25rem;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: clamp(1.9rem, 2.3vw, 2.7rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+
+        .page-header p {
+            margin: 0.6rem 0 0;
+            color: var(--text-muted);
+            max-width: 52rem;
+            line-height: 1.7;
+        }
+
+        /* Accessibility fixes: stronger muted text and placeholders */
+        .text-muted { color: var(--text-muted) !important; }
+        .text-muted.small { color: var(--text-muted-weak) !important; }
+
+        /* Ensure card bodies and table containers stay on the themed surface */
+        .card, .card-body { background: transparent; }
+        .card.shadow, .card.shadow-sm { box-shadow: 0 18px 45px rgba(0,0,0,0.12); }
+
+        /* Table styling: subtle row backgrounds, remove bright white defaults */
+        .table-responsive, .table { background: transparent; }
+        .table > thead > tr > th { background: transparent; }
+            .table > tbody > tr {
+                background: transparent;
+            }
+        .table > tbody > tr {
+                background: rgba(255,255,255,0.02) !important;
+                border: 1px solid rgba(255,255,255,0.03);
+                border-radius: 0.8rem;
+                margin-bottom: 0.5rem;
+        }
+            .table > tbody > tr > td {
+                background: rgba(255,255,255,0.02) !important;
+                border: 1px solid rgba(255,255,255,0.03);
+                padding: 1rem 0.75rem;
+            }
+            .table > tbody > tr > td:first-child {
+                border-top-left-radius: 0.8rem;
+                border-bottom-left-radius: 0.8rem;
+            }
+            .table > tbody > tr > td:last-child {
+                border-top-right-radius: 0.8rem;
+                border-bottom-right-radius: 0.8rem;
+            }
+
+        /* Form inputs: consistent background, text and placeholder contrast */
+        .form-control,
+        .form-select,
+        .form-check-input {
+            background-color: var(--surface) !important;
+            border: 1px solid rgba(255,255,255,0.10) !important;
+            color: var(--text-main) !important;
+            border-radius: 0.6rem !important;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-color) !important;
+            box-shadow: 0 0 0 0.22rem rgba(91,129,255,0.14) !important;
+        }
+        .form-control::placeholder { color: var(--text-muted-weak) !important; }
+        textarea.form-control { min-height: 120px; }
+
+        /* Utility overrides to prevent bright white blocks from bootstrap defaults */
+        .bg-white { background-color: transparent !important; color: var(--text-main) !important; }
+
+        /* Remove default browser focus ring and unwanted white backgrounds */
+        .form-control,
+        .form-select {
+            border: 1px solid rgba(255,255,255,0.08) !important;
+            background-color: var(--surface) !important;
+        }
+        .form-control:focus,
+        .form-select:focus {
+            outline: none !important;
+            box-shadow: 0 0 0 0.28rem rgba(91,129,255,0.12) !important;
+            border-color: var(--accent-color) !important;
+            background-color: var(--surface) !important;
+        }
+
+        /* Autofill (Chrome) - keep dark background */
+        input:-webkit-autofill,
+        textarea:-webkit-autofill,
+        select:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 30px var(--surface) inset !important;
+            box-shadow: 0 0 0 30px var(--surface) inset !important;
+            -webkit-text-fill-color: var(--text-main) !important;
+        }
+
+        /* Help / small text readability */
+        .form-text, .small, .text-muted.small { color: var(--text-muted-weak) !important; }
+
+        /* Focus-visible for keyboard users */
+        .form-control:focus-visible { outline: none; box-shadow: 0 0 0 0.32rem rgba(91,129,255,0.16) !important; }
 
         .metric-card {
-            padding: 1.5rem;
+            padding: 1.7rem;
             position: relative;
             overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.08);
         }
+
         .metric-icon {
             position: absolute;
-            right: 1.5rem;
+            right: 1.4rem;
             top: 50%;
             transform: translateY(-50%);
             font-size: 2.5rem;
-            opacity: 0.2;
+            opacity: 0.12;
         }
-        .metric-value { font-size: 1.75rem; font-weight: 700; margin: 0.5rem 0; }
-        .metric-label { color: var(--text-muted); font-size: 0.875rem; }
 
-        .btn-primary { background-color: var(--accent-color); border: none; }
-        .table { color: var(--text-main); }
-        .table thead th { border-bottom-color: #334155; color: var(--text-muted); font-weight: 500; }
-        .table td { border-bottom-color: #1e293b; padding: 1rem 0.75rem; vertical-align: middle; }
+        .metric-value { font-size: 1.9rem; font-weight: 800; margin: 0.5rem 0; }
+        .metric-label { color: var(--text-muted); font-size: 0.88rem; letter-spacing: 0.04em; }
 
-        /* Responsive */
+        .form-control,
+        .form-select,
+        .form-check-input {
+            background-color: var(--surface);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: var(--text-main);
+            border-radius: 0.9rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(91,129,255,0.18);
+            outline: none;
+        }
+
+        .form-label {
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #5b81ff 0%, #4c6ef5 100%);
+            border: none;
+            box-shadow: 0 18px 35px rgba(91,129,255,0.18);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4c6ef5 0%, #5b81ff 100%);
+        }
+
+        .btn-outline-light {
+            color: var(--text-main);
+            border-color: rgba(255,255,255,0.16);
+            background: rgba(255,255,255,0.03);
+        }
+
+        .btn-outline-light:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .table {
+            color: var(--text-main);
+            border-collapse: separate;
+            border-spacing: 0 0.5rem;
+        }
+
+        .table thead th {
+            border-bottom-color: rgba(255,255,255,0.12);
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 0.84rem;
+            background: transparent;
+            border: none;
+        }
+
+        .table tbody tr {
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.03);
+            border-radius: 1rem;
+        }
+
+        .table td {
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
+            border: none;
+        }
+
+        .list-group-item {
+            background-color: transparent;
+            border-color: rgba(255,255,255,0.08);
+        }
+
+        .table-responsive {
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
         @media (max-width: 992px) {
             #sidebar { transform: translateX(-100%); }
             .main-content { margin-left: 0; }
@@ -135,7 +370,7 @@
         <nav id="sidebar">
             <div class="sidebar-header">
                 <i class="bi bi-mortarboard-fill text-primary"></i>
-                TRACE ERP
+                Campus
             </div>
 
             <div class="nav flex-column mt-3">
@@ -148,7 +383,7 @@
                         <a href="{% url 'liste_classes' %}" class="nav-link {% if 'classe' in request.path %}active{% endif %}">
                             <i class="bi bi-door-open"></i> Classes
                         </a>
-                        <a href="{% url 'ajouter_responsable' %}" class="nav-link {% if 'responsable' in request.path and 'dashboard' not in request.path %}active{% endif %}">
+                        <a href="{% url 'liste_responsables' %}" class="nav-link {% if 'responsables' in request.path %}active{% endif %}">
                             <i class="bi bi-people"></i> Personnels
                         </a>
                     {% endif %}
@@ -192,9 +427,15 @@
                             <span class="role">{{ user.role|upper }}</span>
                         </div>
                     </div>
-                    <a href="{% url 'logout' %}" class="nav-link text-danger m-0 p-2">
-                        <i class="bi bi-box-arrow-right"></i> Déconnexion
-                    </a>
+                    <div class="d-flex gap-2 mb-2">
+                        <button id="themeToggle" class="btn btn-sm btn-outline-light" title="Basculer thème">
+                            <i class="bi bi-sun-fill me-1"></i>
+                            Thème
+                        </button>
+                        <a href="{% url 'logout' %}" class="nav-link text-danger m-0 p-2">
+                            <i class="bi bi-box-arrow-right"></i> Déconnexion
+                        </a>
+                    </div>
                 {% endif %}
             </div>
         </nav>
@@ -207,5 +448,36 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function() {
+            const key = 'campus_theme';
+            const toggle = document.getElementById('themeToggle');
+            function applyTheme(theme) {
+                if (theme === 'light') {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    if (toggle) toggle.innerHTML = '<i class="bi bi-moon-fill me-1"></i> Clair';
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    if (toggle) toggle.innerHTML = '<i class="bi bi-sun-fill me-1"></i> Sombre';
+                }
+            }
+            // init
+            try {
+                const stored = localStorage.getItem(key);
+                applyTheme(stored === 'light' ? 'light' : 'dark');
+            } catch (e) { applyTheme('dark'); }
+
+            if (toggle) {
+                toggle.addEventListener('click', function() {
+                    try {
+                        const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+                        const next = current === 'light' ? 'dark' : 'light';
+                        if (next === 'light') localStorage.setItem(key, 'light'); else localStorage.removeItem(key);
+                        applyTheme(next);
+                    } catch (e) { console.error(e); }
+                });
+            }
+        })();
+    </script>
 </body>
 </html>

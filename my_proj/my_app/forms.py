@@ -3,23 +3,20 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from .models import Utilisateur, Classe, Eleve, Paiement, Note
 
 class ConnexionForm(AuthenticationForm):
-    ROLE_CHOICES = [
-        ('admin', 'Administrateur'),
-        ('responsable', 'Responsable'),
-    ]
     username = forms.CharField(label="Nom d'utilisateur", widget=forms.TextInput(attrs={'class': 'form-control'}))
     password = forms.CharField(label="Mot de passe", widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-    role = forms.ChoiceField(label="Type de compte", choices=ROLE_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
 
 class ResponsableCreationForm(UserCreationForm):
-    class Meta:
-        model = Utilisateur
-        fields = ['username', 'nom', 'prenom', 'sexe', 'contact']
-
-    nom = forms.CharField(label="Nom", widget=forms.TextInput(attrs={'class': 'form-control'}))
-    prenom = forms.CharField(label="Prénom", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    first_name = forms.CharField(label="Nom", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    last_name = forms.CharField(label="Prénom", widget=forms.TextInput(attrs={'class': 'form-control'}))
     sexe = forms.ChoiceField(label="Sexe", choices=Utilisateur.SEXE, widget=forms.Select(attrs={'class': 'form-control'}))
     contact = forms.CharField(label="Contact", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    password1 = forms.CharField(label="Mot de passe", widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    password2 = forms.CharField(label="Confirmer le mot de passe", widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = Utilisateur
+        fields = ['username', 'first_name', 'last_name', 'sexe', 'contact', 'password1', 'password2']
 
 class ClasseForm(forms.ModelForm):
     class Meta:

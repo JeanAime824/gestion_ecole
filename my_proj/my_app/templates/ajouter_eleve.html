@@ -3,37 +3,33 @@
 {% block title %}Ajouter un Élève{% endblock %}
 
 {% block content %}
-<style>
-    .form-control, .form-select {
-        background-color: #0f172a;
-        border: 1px solid #334155;
-        color: #f8fafc;
-    }
-    .form-control:focus, .form-select:focus {
-        background-color: #0f172a;
-        border-color: #3b82f6;
-        color: #f8fafc;
-        box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
-    }
-</style>
+<div class="page-header mb-4">
+    <div>
+        <h1>Nouvel élève</h1>
+        <p class="text-muted">Enregistrez un élève et assignez-lui une classe pour suivre ses résultats.</p>
+    </div>
+    <a href="{% url 'liste_eleves' %}" class="btn btn-outline-light btn-sm">
+        <i class="bi bi-arrow-left me-2"></i> Retour à la liste
+    </a>
+</div>
 
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card">
+        <div class="card shadow-sm border-0">
             <div class="card-header">
-                <h5 class="card-title mb-0">Nouveau Élève</h5>
+                <h5 class="card-title mb-0">Ajouter un élève</h5>
             </div>
             <div class="card-body p-4">
                 <form method="post">
                     {% csrf_token %}
                     {% for field in form %}
-                    <div class="mb-3">
-                        <label class="form-label text-muted small text-uppercase">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.errors %}
-                        <div class="text-danger small mt-1">{{ field.errors }}</div>
-                        {% endif %}
-                    </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger small mt-1">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
                     {% endfor %}
                     <div class="d-flex gap-2 mt-4">
                         <button type="submit" class="btn btn-primary px-4">Enregistrer</button>

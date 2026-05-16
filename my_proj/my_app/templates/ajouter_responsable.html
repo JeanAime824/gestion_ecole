@@ -3,26 +3,36 @@
 {% block title %}Ajouter un Personnel{% endblock %}
 
 {% block content %}
+<div class="page-header mb-4">
+    <div>
+        <h1>Nouvel responsable</h1>
+        <p class="text-muted">Créez un compte pour un membre du personnel du campus.</p>
+    </div>
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-light btn-sm">
+        <i class="bi bi-arrow-left me-2"></i> Retour au dashboard
+    </a>
+</div>
+
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <div class="card">
+        <div class="card shadow-sm border-0">
             <div class="card-header">
-                <h5 class="card-title mb-0">Nouveau Responsable</h5>
+                <h5 class="card-title mb-0">Ajouter un responsable</h5>
             </div>
             <div class="card-body p-4">
                 <form method="post">
                     {% csrf_token %}
                     {% for field in form %}
-                    <div class="mb-3">
-                        <label class="form-label text-muted small text-uppercase">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.help_text %}
-                        <div class="form-text small text-muted">{{ field.help_text }}</div>
-                        {% endif %}
-                        {% if field.errors %}
-                        <div class="text-danger small mt-1">{{ field.errors }}</div>
-                        {% endif %}
-                    </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text small text-muted">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% if field.errors %}
+                                <div class="text-danger small mt-1">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
                     {% endfor %}
                     <div class="d-grid mt-4">
                         <button type="submit" class="btn btn-primary btn-lg">Créer le compte</button>

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Liste des Responsables{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <div>
+        <h1>Responsables</h1>
+        <p class="text-muted">Liste des personnels responsables.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'ajouter_responsable' %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-lg me-2"></i> Ajouter responsable
+        </a>
+        <a href="{% url 'export_responsables_csv' %}" class="btn btn-outline-light btn-sm">Export CSV</a>
+        <a href="{% url 'export_responsables_xlsx' %}" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export Excel
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Nom</th>
+                        <th>Contact</th>
+                        <th>Email</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in responsables %}
+                    <tr>
+                        <td>{{ r.username }}</td>
+                        <td>{{ r.first_name }} {{ r.last_name }}</td>
+                        <td>{{ r.contact }}</td>
+                        <td>{{ r.email }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'export_responsable_detail_csv' r.id %}" class="btn btn-sm btn-outline-light me-1">Exporter</a>
+                            <a href="{% url 'export_responsable_detail_xlsx' r.id %}" class="btn btn-sm btn-outline-light" title="Exporter Excel"><i class="bi bi-file-earmark-spreadsheet"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">Aucun responsable trouvé.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

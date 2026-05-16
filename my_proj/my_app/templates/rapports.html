@@ -3,31 +3,39 @@
 {% block title %}Rapports et Statistiques{% endblock %}
 
 {% block content %}
-<div class="mb-4 d-flex justify-content-between align-items-center">
-    <h2 class="mb-0">Rapports & Statistiques</h2>
-    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-light btn-sm">
-        <i class="bi bi-arrow-left"></i> Retour
-    </a>
+<div class="page-header mb-4">
+    <div>
+        <h1>Rapports & statistiques</h1>
+        <p class="text-muted">Analysez les chiffres du campus et suivez les tendances clés.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-arrow-left me-2"></i> Retour
+        </a>
+        <a href="{% url 'export_rapports_xlsx' %}" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-file-earmark-spreadsheet me-2"></i> Export Excel
+        </a>
+    </div>
 </div>
 
 <div class="row mb-4">
     <div class="col-md-4">
         <div class="card metric-card">
-            <div class="metric-label">Total Élèves</div>
+            <div class="metric-label">Total élèves</div>
             <div class="metric-value">{{ total_eleves }}</div>
             <div class="metric-icon"><i class="bi bi-people"></i></div>
         </div>
     </div>
     <div class="col-md-4">
         <div class="card metric-card border-start border-success border-4">
-            <div class="metric-label">Recettes Totales</div>
+            <div class="metric-label">Recettes totales</div>
             <div class="metric-value text-success">{{ total_paiements }} <small style="font-size: 0.5em;">FCFA</small></div>
             <div class="metric-icon"><i class="bi bi-cash-stack"></i></div>
         </div>
     </div>
     <div class="col-md-4">
         <div class="card metric-card border-start border-info border-4">
-            <div class="metric-label">Moyenne Générale</div>
+            <div class="metric-label">Moyenne générale</div>
             <div class="metric-value text-info">{{ moyenne_generale }}/20</div>
             <div class="metric-icon"><i class="bi bi-journal-check"></i></div>
         </div>
@@ -36,9 +44,9 @@
 
 <div class="row">
     <div class="col-md-6">
-        <div class="card h-100">
+        <div class="card h-100 shadow-sm border-0">
             <div class="card-header">
-                <h5 class="card-title mb-0">Répartition par Classe</h5>
+                <h5 class="card-title mb-0">Répartition par classe</h5>
             </div>
             <div class="card-body p-0">
                 <table class="table mb-0">
@@ -63,9 +71,9 @@
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card h-100">
+        <div class="card h-100 shadow-sm border-0">
             <div class="card-header">
-                <h5 class="card-title mb-0">Derniers Paiements</h5>
+                <h5 class="card-title mb-0">Derniers paiements</h5>
             </div>
             <div class="card-body p-0">
                 <ul class="list-group list-group-flush bg-transparent">

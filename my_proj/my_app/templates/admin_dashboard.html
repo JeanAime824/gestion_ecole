@@ -5,8 +5,29 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col-12">
-        <h4 class="mb-1">Vue d'ensemble de TRACE ERP</h4>
-        <p class="text-muted">Bienvenue, {{ user.get_full_name|default:user.username }}</p>
+        <div class="page-header">
+            <div>
+                <h1>Vue d'ensemble de Campus</h1>
+                <p>Bienvenue, {{ user.get_full_name|default:user.username }}. Consultez les principales métriques de gestion scolaire en temps réel.</p>
+            </div>
+            <div>
+                <div class="btn-group">
+                    <button class="btn btn-outline-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">Export</button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{% url 'export_eleves_csv' %}">Export élèves (CSV)</a></li>
+                        <li><a class="dropdown-item" href="{% url 'export_eleves_xlsx' %}">Export élèves (Excel)</a></li>
+                        <li><a class="dropdown-item" href="{% url 'export_responsables_csv' %}">Export responsables (CSV)</a></li>
+                        <li><a class="dropdown-item" href="{% url 'export_responsables_xlsx' %}">Export responsables (Excel)</a></li>
+                        <li><a class="dropdown-item" href="{% url 'export_paiements_csv' %}">Export paiements (CSV)</a></li>
+                        <li><a class="dropdown-item" href="{% url 'export_paiements_xlsx' %}">Export paiements (Excel)</a></li>
+                        <li><a class="dropdown-item" href="{% url 'export_notes_csv' %}">Export notes (CSV)</a></li>
+                        <li><a class="dropdown-item" href="{% url 'export_notes_xlsx' %}">Export notes (Excel)</a></li>
+                        <li><a class="dropdown-item" href="{% url 'export_rapports_xlsx' %}">Export rapports (Excel)</a></li>
+                        <li><a class="dropdown-item" href="{% url 'export_notes_xlsx' %}">Export notes (Excel)</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
