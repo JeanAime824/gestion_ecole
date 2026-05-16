@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Rapports et Statistiques{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2><i class="bi bi-graph-up"></i> Rapports et Statistiques</h2>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white shadow">
+            <div class="card-body">
+                <h5 class="card-title">Total Élèves</h5>
+                <h2 class="display-4">{{ total_eleves }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-success text-white shadow">
+            <div class="card-body">
+                <h5 class="card-title">Total Recettes</h5>
+                <h2 class="display-4">{{ total_paiements }} <small style="font-size: 0.5em;">FCFA</small></h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-info text-white shadow">
+            <div class="card-body">
+                <h5 class="card-title">Moyenne Générale</h5>
+                <h2 class="display-4">{{ moyenne_generale }}/20</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Répartition par Classe</h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Classe</th>
+                            <th>Niveau</th>
+                            <th>Élèves</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for classe in repartition_classe %}
+                        <tr>
+                            <td>{{ classe.nom }}</td>
+                            <td>{{ classe.niveau }}</td>
+                            <td><span class="badge bg-secondary">{{ classe.nb_eleves }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Derniers Paiements</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for p in derniers_paiements %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ p.eleve.nom }} {{ p.eleve.prenom }}
+                        <span class="text-success fw-bold">+{{ p.montant }} FCFA</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">Aucun paiement récent</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Retour au Dashboard</a>
+</div>
+{% endblock %}
